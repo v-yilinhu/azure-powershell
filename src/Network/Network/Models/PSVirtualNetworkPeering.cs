@@ -63,6 +63,12 @@ namespace Microsoft.Azure.Commands.Network.Models
         [Ps1Xml(Target = ViewControl.Table)]
         public string ProvisioningState { get; set; }
 
+        [JsonProperty(Order = 1)]
+        public string PeeringSyncLevel { get; set; }
+
+        [JsonProperty(Order = 1)]
+        public PSAddressSpace PeeredRemoteAddressSpace { get; set; }
+
         [JsonIgnore]
         public string RemoteVirtualNetworkText
         {
@@ -85,6 +91,12 @@ namespace Microsoft.Azure.Commands.Network.Models
         public string RemoteBgpCommunitiesText
         {
             get { return JsonConvert.SerializeObject(RemoteBgpCommunities, Formatting.Indented, new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore }); }
+        }
+
+        [JsonIgnore]
+        public string PeeredRemoteAddressSpaceText
+        {
+            get { return JsonConvert.SerializeObject(PeeredRemoteAddressSpace, Formatting.Indented, new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore }); }
         }
     }
 }

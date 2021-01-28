@@ -20,6 +20,9 @@ using System.Globalization;
 using System.Management.Automation;
 using System.Text;
 using Newtonsoft.Json;
+using Microsoft.WindowsAzure.Commands.Utilities.Common;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace Microsoft.Azure.Commands.Automation.Common
 {
@@ -31,20 +34,30 @@ namespace Microsoft.Azure.Commands.Automation.Common
             {
                 return null;
             }
-            while(inputObject is PSObject && ((PSObject)inputObject).BaseObject != null)
+            if (inputObject is object[] @objectArray)
             {
-                inputObject = ((PSObject)inputObject).BaseObject;
+                List<object> objectList = objectArray.ToList();
+                return string.Format("[{0}]", string.Join(",", objectList.Select(Serialize).ToList()));
             }
-            if(inputObject is string)
+            if (inputObject is PSObject @psObject)
             {
-                inputObject = ((string)inputObject).Trim();
+                Dictionary<string, object> hashTable = new Dictionary<string, object>();
+                foreach (var item in psObject.Properties)
+                {
+                    hashTable.Add(item.Name, item.Value);
+                }
+                inputObject = hashTable;
+            }
+            if (inputObject is string @str)
+            {
+                inputObject = str.Trim();
             }
             return JsonConvert.SerializeObject(inputObject);
         }
 
         public static PSObject Deserialize(string json)
         {
-            if (String.IsNullOrEmpty(json))
+            if (string.IsNullOrEmpty(json))
             {
                 return null;
             }
